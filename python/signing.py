@@ -37,20 +37,21 @@ def sign_request(access_key='',secret_key='',ua='enstratus.py',
     # But this tuple works fine for now
     return (timestamp, b64auth)
 
-access_key = ''
-secret_key = ''
-url = 'https://api.enstratus.com/api/enstratus/2012-02-29/geography/Cloud'
-ua = 'enstratus.py'
-(timestamp, signature) = sign_request(access_key=access_key, secret_key=secret_key)
+if __name == '__main__':
+    access_key = ''
+    secret_key = ''
+    url = 'https://api.enstratus.com/api/enstratus/2012-02-29/geography/Cloud'
+    ua = 'enstratus.py'
+    (timestamp, signature) = sign_request(access_key=access_key, secret_key=secret_key)
 
-headers = {'x-esauth-access':access_key,
-            'x-esauth-timestamp':str(timestamp),
-            'x-esauth-signature':signature,
-            'x-es-details':'basic',
-            'accept':'application/json',
-            'user-agent':ua}
+    headers = {'x-esauth-access':access_key,
+                'x-esauth-timestamp':str(timestamp),
+                'x-esauth-signature':signature,
+                'x-es-details':'basic',
+                'accept':'application/json',
+                'user-agent':ua}
 
-results = r.get(url,headers=headers)
+    results = r.get(url,headers=headers)
 
-pp.pprint(results.headers)
-pp.pprint(json.loads(results.content))
+    pp.pprint(results.headers)
+    pp.pprint(json.loads(results.content))
