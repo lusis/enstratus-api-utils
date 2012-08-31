@@ -37,7 +37,7 @@ def sign_request(access_key='',secret_key='',ua='enstratus.py',
     # But this tuple works fine for now
     return (timestamp, b64auth)
 
-if __name == '__main__':
+if __name__ == '__main__':
     access_key = ''
     secret_key = ''
     url = 'https://api.enstratus.com/api/enstratus/2012-02-29/geography/Cloud'
