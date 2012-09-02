@@ -3,6 +3,8 @@ import time
 import requests as r
 import pprint as pp
 import json
+import os
+
 """
 The example call we're making in this is getting a list of known clouds:
 
@@ -14,9 +16,9 @@ and requires no filters.
 These also make for great defaults.
 """
 
-def sign_request(access_key='',secret_key='',ua='enstratus.py',
-                http_method='GET',path='geography/Cloud',
-                api_version='2012-02-29'):
+def sign_request(access_key = '', secret_key = '',ua = 'enstratus.py',
+                http_method = 'GET', path = 'geography/Cloud',
+                api_version = '2012-02-29'):
 
     timestamp = int(round(time.time() * 1000))
     sign_path = '/api/enstratus/'+api_version+'/'+path
@@ -38,11 +40,12 @@ def sign_request(access_key='',secret_key='',ua='enstratus.py',
     return (timestamp, b64auth)
 
 if __name__ == '__main__':
-    access_key = ''
-    secret_key = ''
+    access_key = os.environ['ES_ACCESS_KEY']
+    secret_key = os.environ['ES_SECRET_KEY']
     url = 'https://api.enstratus.com/api/enstratus/2012-02-29/geography/Cloud'
     ua = 'enstratus.py'
-    (timestamp, signature) = sign_request(access_key=access_key, secret_key=secret_key)
+    (timestamp, signature) = sign_request(access_key = access_key,
+                                        secret_key = secret_key)
 
     headers = {'x-esauth-access':access_key,
                 'x-esauth-timestamp':str(timestamp),
@@ -51,7 +54,7 @@ if __name__ == '__main__':
                 'accept':'application/json',
                 'user-agent':ua}
 
-    results = r.get(url,headers=headers)
+    results = r.get(url, headers = headers)
 
     pp.pprint(results.headers)
     pp.pprint(json.loads(results.content))

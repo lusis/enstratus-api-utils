@@ -2,12 +2,12 @@
 All of the python examples use the `requests` library from Kenneth Rietz.
 
 ## Signing requests
-Change the `access_key` and `secret_key` values to match your enStratus credentials and run:
+Set the enviroment variables `ES_ACCESS_KEY` and `ES_SECRET_KEY` to match your enStratus API keys and run:
 
 `python signing.py`
 
 ### Expected Output
-```
+```python
 {'content-type': 'application/json;charset=UTF-8',
  'date': 'Fri, 31 Aug 2012 21:06:29 GMT',
  'server': 'Apache-Coyote/1.1',
@@ -34,7 +34,5 @@ Change the `access_key` and `secret_key` values to match your enStratus credenti
               u'provider': u'Amazon',
               u'status': u'ACTIVE',
               u'statusUrl': u'http://status.aws.amazon.com/',
-              u'webUrl': u'http://aws.amazon.com'},
-	      ..................
-             ]}
+              u'webUrl': u'http://aws.amazon.com'}]}
 ```
