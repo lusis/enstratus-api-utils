@@ -1,6 +1,8 @@
 # enStratus API Utils
 
 These are just a few bits of example code and notes around how to work with the enStratus API.
+I've also tried to keep the interfaces in each language similar where appropriate for comparison purposes (i.e. not passing an option hash in Ruby or not chaining methods)
+For that reason, it's not the prettiest usage of each langauge but it's much easier to compare between examples.
 
 # What's in here?
 Just a toc of sorts
