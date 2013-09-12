@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013 Dell. All rights reserver. Written by Doron Grinstein doron.grinstein@software.dell.com
+﻿// Copyright (c) 2013 Dell. All rights reserved. Written by Doron Grinstein doron.grinstein@software.dell.com
 using System;
 using System.Collections.Generic;
 using System.Linq;

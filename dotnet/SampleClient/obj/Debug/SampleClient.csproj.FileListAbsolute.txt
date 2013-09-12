@@ -9,3 +9,8 @@ c:\projects\Enstratius\SampleClient\obj\Debug\SampleClient.pdb
 C:\projects\enstratus-api-utils\dotnet\SampleClient\bin\Debug\SampleClient.exe.config
 C:\projects\enstratus-api-utils\dotnet\SampleClient\obj\Debug\SampleClient.exe
 C:\projects\enstratus-api-utils\dotnet\SampleClient\obj\Debug\SampleClient.pdb
+C:\projects\enstratus-api-utils\dotnet\SampleClient\bin\Debug\SampleClient.exe
+C:\projects\enstratus-api-utils\dotnet\SampleClient\bin\Debug\SampleClient.pdb
+C:\projects\enstratus-api-utils\dotnet\SampleClient\bin\Debug\RestSharp.dll
+C:\projects\enstratus-api-utils\dotnet\SampleClient\bin\Debug\RestSharp.xml
+C:\projects\enstratus-api-utils\dotnet\SampleClient\obj\Debug\SampleClient.csprojResolveAssemblyReference.cache
