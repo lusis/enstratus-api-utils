@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Dell.CTO.Enstratius.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="host_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://demo.enstratius.com:15000</Value>
+    </Setting>
+    <Setting Name="api_access_id" Type="System.String" Scope="User">
+      <Value Profile="(Default)">YLMHXSSPDCHEUVTVTXOD</Value>
+    </Setting>
+    <Setting Name="secret_key" Type="System.String" Scope="User">
+      <Value Profile="(Default)">secret_key_goes_here_need_to_change_before_running</Value>
+    </Setting>
+    <Setting Name="user_agent" Type="System.String" Scope="User">
+      <Value Profile="(Default)">test</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
