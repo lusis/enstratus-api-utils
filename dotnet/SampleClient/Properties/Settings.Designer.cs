@@ -49,18 +49,6 @@ namespace Dell.CTO.Enstratius.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("secret_key_goes_here_need_to_change_before_running")]
-        public string secret_key {
-            get {
-                return ((string)(this["secret_key"]));
-            }
-            set {
-                this["secret_key"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("test")]
         public string user_agent {
             get {

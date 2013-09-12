@@ -104,6 +104,9 @@ namespace Dell.CTO.Enstratius
         {
             host_base = Properties.Settings.Default["host_name"].ToString();
             api_access_id = Properties.Settings.Default["api_access_id"].ToString();
+            secret_key = Environment.GetEnvironmentVariable("ES_SECRET_KEY");
+            if (secret_key == null)
+                throw new Exception("Environment variable ES_SECRET_KEY must contain the secret key");
             secret_key = Properties.Settings.Default["secret_key"].ToString();
             client = new RestClient(host_base);
             client.UserAgent = Properties.Settings.Default["user_agent"].ToString();

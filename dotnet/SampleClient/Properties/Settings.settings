@@ -8,9 +8,6 @@
     <Setting Name="api_access_id" Type="System.String" Scope="User">
       <Value Profile="(Default)">YLMHXSSPDCHEUVTVTXOD</Value>
     </Setting>
-    <Setting Name="secret_key" Type="System.String" Scope="User">
-      <Value Profile="(Default)">secret_key_goes_here_need_to_change_before_running</Value>
-    </Setting>
     <Setting Name="user_agent" Type="System.String" Scope="User">
       <Value Profile="(Default)">test</Value>
     </Setting>
