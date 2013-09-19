@@ -15,6 +15,7 @@ namespace Dell.CTO.Enstratius
         public string api_access_id;
         public string secret_key;
         public RestClient client;
+        public string api_root;
         Dictionary<string, string> additionalHeaders = null;
 
 
@@ -36,15 +37,53 @@ namespace Dell.CTO.Enstratius
         }
 
 
-        public string LauchServer(string budget, string name, string description, string machineImageId, int cpus, int ram, string dataCenterId)
+        public string CreateUser(string accountId, 
+                              string givenName,
+                              string familyName,
+                              string email,
+                              string emailTarget,
+                              string notifyViaEmail,
+                              string notifyViaScreen,
+                              string eventType,
+                              string severity,
+                              string billingCode,
+                              string groupId)
+        {
+            string xml = AddUserXmlTemplate.getXml();
+            user u = new user();
+            u.accountId = accountId;
+            u.givenName = givenName;
+            u.familyName = familyName;
+            u.email = email;
+            u.emailTarget = emailTarget;
+            u.notifyViaEmail = notifyViaEmail;
+            u.notifyViaScreen = notifyViaScreen;
+            u.eventType = eventType;
+            u.severity = severity;
+            u.billingCode = billingCode;
+            u.groupId = groupId;
+            string addUserXmlString = SmartFormat.Smart.Format(xml, u);
+
+
+            clearHeaders();
+            AddHeader("x-es-details", "basic");
+            AddHeader("Accept", "application/xml"); // for JSON use application/json
+            string resource = api_root + "/admin/User";
+            return invokeStringPost(resource, addUserXmlString);
+        }
+
+
+
+
+        public string LauchServer(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
         {
             clearHeaders();
             AddHeader("x-es-details", "basic");
             AddHeader("Accept", "application/xml"); // for JSON use application/json
-            string resource = "/api/enstratus/2013-03-13/infrastructure/Server";
-            launch l = new launch(budget, name, description, machineImageId, cpus, ram, dataCenterId);
+            string resource = api_root + "/infrastructure/Server";
+            launch l = new launch(budget, name, description, machineImageId, product, dataCenterId);
             var serializer = new EnstratiusSerializer<launch>();
-            return invokeCommand(Method.POST, resource , null, l, serializer);
+            return invokeCommand(Method.POST, resource, null, l, serializer);
         }
 
         public string StopServer(string serverId)
@@ -52,7 +91,7 @@ namespace Dell.CTO.Enstratius
             clearHeaders();
             AddHeader("x-es-details", "basic");
             AddHeader("Accept", "application/xml"); // for JSON use application/json
-            string resource = "/api/enstratus/2013-03-13/infrastructure/Server/" + serverId;
+            string resource = api_root + "/infrastructure/Server/" + serverId;
             stop s = new stop();
             s.force = true;
             s.server = "";
@@ -65,7 +104,7 @@ namespace Dell.CTO.Enstratius
             clearHeaders();
             AddHeader("x-es-details", "basic");
             AddHeader("Accept", "application/xml"); // for JSON use application/json
-            string resource = "/api/enstratus/2013-03-13/infrastructure/Server/" + serverId;
+            string resource = api_root + "/infrastructure/Server/" + serverId;
             return invokeCommand(Method.DELETE, resource, "reason=" + reason, null, null);
         }
 
@@ -73,7 +112,7 @@ namespace Dell.CTO.Enstratius
         {
             string full_resource = resource;
             if (parameters != null)
-               full_resource += "?" + parameters;
+                full_resource += "?" + parameters;
 
             RestRequest request = new RestRequest(full_resource, method);
             request.RequestFormat = DataFormat.Xml;
@@ -81,7 +120,7 @@ namespace Dell.CTO.Enstratius
                 request.XmlSerializer = serializer;
             if ((method == Method.POST) || (method == Method.PUT))
                 request.AddBody(obj);
-                
+
             long unixTimeStamp = GetCurrentUnixTimestampMillis();
             string toSign = api_access_id + ":" + method.ToString() + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;
             var signature = sign(secret_key, toSign);
@@ -99,6 +138,23 @@ namespace Dell.CTO.Enstratius
             return response.Content;
         }
 
+        public string invokeStringPost(string resource, string xml)
+        {
+            RestRequest request = new RestRequest(resource, Method.POST);
+            request.AddHeader("Accept", "application/xml");
+            request.RequestFormat = DataFormat.Xml;
+            request.AddParameter("text/xml", xml, ParameterType.RequestBody);
+            long unixTimeStamp = GetCurrentUnixTimestampMillis();
+            string toSign = api_access_id + ":" + "POST" + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;
+            var signature = sign(secret_key, toSign);
+
+            request.AddHeader("x-esauth-access", api_access_id);
+            request.AddHeader("x-esauth-signature", signature);
+            request.AddHeader("x-esauth-timestamp", unixTimeStamp.ToString());
+            var response = client.Execute(request);
+            return response.Content;
+        }
+
 
         private void init()
         {
@@ -107,9 +163,10 @@ namespace Dell.CTO.Enstratius
             secret_key = Environment.GetEnvironmentVariable("ES_SECRET_KEY");
             if (secret_key == null)
                 throw new Exception("Environment variable ES_SECRET_KEY must contain the secret key");
-            secret_key = Properties.Settings.Default["secret_key"].ToString();
+            //secret_key = Properties.Settings.Default["secret_key"].ToString();
             client = new RestClient(host_base);
             client.UserAgent = Properties.Settings.Default["user_agent"].ToString();
+            api_root = Properties.Settings.Default["api_root"].ToString();
         }
 
 

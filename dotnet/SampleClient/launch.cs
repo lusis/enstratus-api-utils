@@ -14,7 +14,7 @@ namespace Dell.CTO.Enstratius
         public launch(){}
         
 
-        public launch(string budget, string name, string description, string machineImageId, int cpu, int ram, string dataCenterId)
+        public launch(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
         {
             servers = new Servers();
             servers.server = new Server();
@@ -22,8 +22,8 @@ namespace Dell.CTO.Enstratius
             servers.server.name = name;
             servers.server.description = description;
             servers.server.machineImage.machineImageId = machineImageId;
-            string product = cpu.ToString() + ":" + ram.ToString();
-            servers.server.product = product;
+            string _product = product;
+            servers.server.product = _product;
             servers.server.dataCenter.dataCenterId = dataCenterId;
         }
 

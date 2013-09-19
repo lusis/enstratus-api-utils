@@ -37,7 +37,7 @@ namespace Dell.CTO.Enstratius.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("YLMHXSSPDCHEUVTVTXOD")]
+        [global::System.Configuration.DefaultSettingValueAttribute("HUFVVXTGJWVZYFWRMAHU")]
         public string api_access_id {
             get {
                 return ((string)(this["api_access_id"]));
@@ -56,6 +56,31 @@ namespace Dell.CTO.Enstratius.Properties {
             }
             set {
                 this["user_agent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/api/enstratus/2013-03-13")]
+        public string api_root {
+            get {
+                return ((string)(this["api_root"]));
+            }
+            set {
+                this["api_root"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("you must set an environment variable called ES_SECRET_KEY. Do not change this val" +
+            "ue. It is for information only")]
+        public string api_secret_key {
+            get {
+                return ((string)(this["api_secret_key"]));
+            }
+            set {
+                this["api_secret_key"] = value;
             }
         }
     }

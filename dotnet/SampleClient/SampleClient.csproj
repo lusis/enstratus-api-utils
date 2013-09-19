@@ -35,6 +35,9 @@
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
     </Reference>
+    <Reference Include="SmartFormat">
+      <HintPath>..\packages\SmartFormat.NET.1.0.0.0\lib\net35-Client\SmartFormat.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="addUsers.cs" />
+    <Compile Include="AddUserXmlTemplate.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="EnstratiusSerializer.cs" />
     <Compile Include="launch.cs" />
@@ -55,6 +60,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="stop.cs" />
+    <Compile Include="user.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

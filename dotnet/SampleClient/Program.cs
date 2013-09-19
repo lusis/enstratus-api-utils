@@ -29,15 +29,17 @@ namespace Dell.CTO.Enstratius
     {
         static void Main(string[] args)
         {
-            Client r = new Client();
+            Client c = new Client();
 
             // code commented below was tested successfuly. It documents what this assembly is capable of doing:
 
-            //string result = r.StopServer("608");
-            //string result = r.LauchServer("200", "doron-100", "started from an api call", "300", 1, 512, "1");
-            string result = r.TerminateServer("910", "do not need it anymore");
-            
-            Console.WriteLine(result);
+            //string result = c.StopServer("927");
+            //string result = c.LauchServer("200", "doron-100", "started from an api call", "300", "1:512", "1");
+            //string result = c.TerminateServer("927", "do not need it anymore");
+            //string result = c.CreateUser("0", "Lisi", "Grinstein", "lisi@dell.com", "lisi@software.dell.com", "true", "true", "ALARM.ANY", "2", "0", "202");
+
+
+//            Console.WriteLine(result);
             Console.WriteLine("----all done----");
             Console.ReadKey();
         }

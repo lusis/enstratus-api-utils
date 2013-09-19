@@ -1,0 +1,27 @@
+﻿<addUser>
+  <users>
+    <user>
+      <account accountId="{accountId}" />
+      <givenName>{givenName}</givenName>
+      <familyName>{familyName}</familyName>
+      <email>{email}</email>
+      <notificationsTargets>
+        <emailTarget>{emailtarget}</emailTarget>
+      </notificationsTargets>
+      <notificationsSettings>
+        <notificationsSetting>
+          <notifyViaEmail>{notifyViaEmail}</notifyViaEmail>
+          <notifyViaScreen>{notifyViaScreen}</notifyViaScreen>
+          <eventType>{eventType}</eventType>
+          <severity>{severity}</severity>
+        </notificationsSetting>
+      </notificationsSettings>
+      <billingCodes>
+        <billingCode billingCodeId="{billingCode}" />
+      </billingCodes>
+      <groups>
+        <group groupId="{groupId}" />
+      </groups>
+    </user>
+  </users>
+</addUser>

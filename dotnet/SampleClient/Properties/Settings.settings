@@ -6,10 +6,16 @@
       <Value Profile="(Default)">http://demo.enstratius.com:15000</Value>
     </Setting>
     <Setting Name="api_access_id" Type="System.String" Scope="User">
-      <Value Profile="(Default)">YLMHXSSPDCHEUVTVTXOD</Value>
+      <Value Profile="(Default)">HUFVVXTGJWVZYFWRMAHU</Value>
     </Setting>
     <Setting Name="user_agent" Type="System.String" Scope="User">
       <Value Profile="(Default)">test</Value>
+    </Setting>
+    <Setting Name="api_root" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/api/enstratus/2013-03-13</Value>
+    </Setting>
+    <Setting Name="api_secret_key" Type="System.String" Scope="User">
+      <Value Profile="(Default)">you must set an environment variable called ES_SECRET_KEY. Do not change this value. It is for information only</Value>
     </Setting>
   </Settings>
 </SettingsFile>
