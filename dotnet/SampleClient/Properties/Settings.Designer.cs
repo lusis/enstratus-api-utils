@@ -83,5 +83,43 @@ namespace Dell.CTO.Enstratius.Properties {
                 this["api_secret_key"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<addDeployment>
+  <deployment budget=""{budget}"" type=""{deployment_type}"" >
+    <name>{name}</name>
+	<description>{description}</description>
+	<label>{label}</label>
+	<forServiceCatalog>{for_service_catalog}</forServiceCatalog>
+	<drStorageRegion regionId=""{storage_region_id}"" />
+	<backupWindow>
+	 <timeWindow daysOfWeek=""{backup_days_of_week}"" startHour=""{backup_start_hour}"" startMinute=""{backup_start_minute}"" endHour=""{backup_end_hour}"" endMinute=""{backup_end_minute}"" />
+	</backupWindow>
+	<maintenanceWindow>
+	 <timeWindow daysOfWeek=""{maintenance_days_of_week}"" startHour=""{maintenance_start_hour}"" startMinute=""{maintenance_start_minute}"" endHour=""{maintenance_end_hour}"" endMinute=""{maintenance_end_minute}"" />
+	</maintenanceWindow>
+  </deployment>
+</addDeployment>")]
+        public string deployment_xml {
+            get {
+                return ((string)(this["deployment_xml"]));
+            }
+            set {
+                this["deployment_xml"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<deploy>\r\n  <deployment  />\r\n</deploy>")]
+        public string launch_deployment_xml {
+            get {
+                return ((string)(this["launch_deployment_xml"]));
+            }
+            set {
+                this["launch_deployment_xml"] = value;
+            }
+        }
     }
 }

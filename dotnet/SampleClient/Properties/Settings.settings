@@ -17,5 +17,27 @@
     <Setting Name="api_secret_key" Type="System.String" Scope="User">
       <Value Profile="(Default)">you must set an environment variable called ES_SECRET_KEY. Do not change this value. It is for information only</Value>
     </Setting>
+    <Setting Name="deployment_xml" Type="System.String" Scope="User">
+      <Value Profile="(Default)">&lt;addDeployment&gt;
+  &lt;deployment budget="{budget}" type="{deployment_type}" &gt;
+    &lt;name&gt;{name}&lt;/name&gt;
+	&lt;description&gt;{description}&lt;/description&gt;
+	&lt;label&gt;{label}&lt;/label&gt;
+	&lt;forServiceCatalog&gt;{for_service_catalog}&lt;/forServiceCatalog&gt;
+	&lt;drStorageRegion regionId="{storage_region_id}" /&gt;
+	&lt;backupWindow&gt;
+	 &lt;timeWindow daysOfWeek="{backup_days_of_week}" startHour="{backup_start_hour}" startMinute="{backup_start_minute}" endHour="{backup_end_hour}" endMinute="{backup_end_minute}" /&gt;
+	&lt;/backupWindow&gt;
+	&lt;maintenanceWindow&gt;
+	 &lt;timeWindow daysOfWeek="{maintenance_days_of_week}" startHour="{maintenance_start_hour}" startMinute="{maintenance_start_minute}" endHour="{maintenance_end_hour}" endMinute="{maintenance_end_minute}" /&gt;
+	&lt;/maintenanceWindow&gt;
+  &lt;/deployment&gt;
+&lt;/addDeployment&gt;</Value>
+    </Setting>
+    <Setting Name="launch_deployment_xml" Type="System.String" Scope="User">
+      <Value Profile="(Default)">&lt;deploy&gt;
+  &lt;deployment  /&gt;
+&lt;/deploy&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

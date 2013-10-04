@@ -47,9 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="addUsers.cs" />
     <Compile Include="AddUserXmlTemplate.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="Deployment.cs" />
     <Compile Include="EnstratiusSerializer.cs" />
     <Compile Include="launch.cs" />
     <Compile Include="Program.cs" />

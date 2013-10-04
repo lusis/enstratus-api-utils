@@ -37,7 +37,10 @@ namespace Dell.CTO.Enstratius
         }
 
 
-        public string CreateUser(string accountId, 
+   
+
+
+        public string CreateUser(string accountId,
                               string givenName,
                               string familyName,
                               string email,
@@ -72,6 +75,27 @@ namespace Dell.CTO.Enstratius
             return invokeStringPost(resource, addUserXmlString);
         }
 
+
+        public string CreatehDeployment(Deployment deployment)
+        {
+            string template = Properties.Settings.Default["deployment_xml"].ToString();
+            
+            string xml = SmartFormat.Smart.Format(template, deployment);
+            clearHeaders();
+            AddHeader("x-es-details", "basic");
+            AddHeader("Accept", "application/xml"); // for JSON use application/json
+            string resource = api_root + "/automation/Deployment";
+            return invokeStringPost(resource, xml);
+        }
+
+        public string LaunchDeployment(string id)
+        {
+            string template = Properties.Settings.Default["launch_deployment_xml"].ToString();
+            clearHeaders();
+            AddHeader("Accept", "application/xml"); // for JSON use application/json
+            string resource = api_root + "/automation/Deployment/" + id;
+            return invokeStringPost(resource, template, true);
+        }
 
 
 
@@ -138,14 +162,22 @@ namespace Dell.CTO.Enstratius
             return response.Content;
         }
 
-        public string invokeStringPost(string resource, string xml)
+        public string invokeStringPost(string resource, string xml, Boolean put=false)
         {
-            RestRequest request = new RestRequest(resource, Method.POST);
+            Method method = Method.POST;
+            string methodString = "POST";
+            if (put)
+            {
+                method = Method.PUT;
+                methodString = "PUT";
+            }
+
+            RestRequest request = new RestRequest(resource, method);
             request.AddHeader("Accept", "application/xml");
             request.RequestFormat = DataFormat.Xml;
             request.AddParameter("text/xml", xml, ParameterType.RequestBody);
             long unixTimeStamp = GetCurrentUnixTimestampMillis();
-            string toSign = api_access_id + ":" + "POST" + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;
+            string toSign = api_access_id + ":" + methodString + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;
             var signature = sign(secret_key, toSign);
 
             request.AddHeader("x-esauth-access", api_access_id);
@@ -185,7 +217,9 @@ namespace Dell.CTO.Enstratius
 
         public static long GetCurrentUnixTimestampMillis()
         {
-            return (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+            DateTime tempTime = DateTime.UtcNow; //.Add(new TimeSpan(1, 0, 0));
+
+            return (long)(tempTime - UnixEpoch).TotalMilliseconds;
         }
     }
 
