@@ -94,7 +94,7 @@ namespace Dell.CTO.Enstratius
             clearHeaders();
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/automation/Deployment/" + id;
-            return invokeStringPost(resource, template, true);
+            return invokeStringPost(resource, template, true); // 3rd parameter true=PUT (not POST)
         }
 
 
