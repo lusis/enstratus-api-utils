@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Dell.CTO.Enstratius
 {
-    class Client
+    public class Client
     {
         public string host_base;
         public string api_access_id;
@@ -37,7 +37,23 @@ namespace Dell.CTO.Enstratius
         }
 
 
-   
+        public string GetCustomers()
+        {
+            string resource = api_root + "/admin/Customer";
+            var method = Method.GET;
+            AddHeader("x-es-details", "extended");
+            return invokeCommand(method, resource, null, null, null);
+        }
+
+        public string GetAccount(string id)
+        {
+            string resource = api_root + "/admin/Account";
+            var method = Method.GET;
+            AddHeader("x-es-details", "basic");
+            return invokeCommand(method, resource, "accountId=" + id, null, null);
+        }
+
+
 
 
         public string CreateUser(string accountId,

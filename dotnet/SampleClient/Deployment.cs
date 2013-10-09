@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dell.CTO.Enstratius
 {
-    class Deployment
+    public class Deployment
     {
         public string budget { get; set; }
         public string name { get; set; }
