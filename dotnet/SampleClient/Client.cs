@@ -6,22 +6,34 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+
+
+
 
 namespace Dell.CTO.Enstratius
 {
     public class Client
     {
-        public string host_base;
-        public string api_access_id;
-        public string secret_key;
-        public RestClient client;
-        public string api_root;
-        Dictionary<string, string> additionalHeaders = null;
+        private string host_base;
+        private string api_access_id;
+        private string secret_key;
+        private RestClient client;
+        private string api_root;
+        private Dictionary<string, string> additionalHeaders = null;
 
-
-        public Client()
+        /// <summary>
+        /// The constructor for the DMCM Client initializes an object that can communicate with a DMCM server and submit REST API calls.
+        /// </summary>
+        /// <param name="hostBase">The URI endpoint for the DMCM API. For example: http://demo.enstratius.com:15000</param>
+        /// <param name="apiAccessId">An API access ID that must be obtained from the DMCM web console. for example HUFVVXTGJWVZYFWRMAHU</param>
+        /// <param name="apiSecretKey">The secret key corresponding to the API ID. It must be obtained from the DMCM web console</param>
+        /// <param name="userAgent">Any string value that you wish to convey as the user-agent to the DMCM system</param>
+        /// <param name="apiRoot">The portion of the URI after the host name. DMCM supports multiple versions of its API. For example: /api/enstratus/2013-03-13</param>
+        public Client(string hostBase, string apiAccessId, string apiSecretKey, string userAgent, string apiRoot)
         {
-            init();
+            init(hostBase, apiAccessId, apiSecretKey, userAgent, apiRoot);
         }
 
         public void AddHeader(string name, string value)
@@ -37,22 +49,53 @@ namespace Dell.CTO.Enstratius
         }
 
 
-        public string GetCustomers()
+        public CustomerList GetCustomerList()
         {
+            return new JsonToList<CustomerList>().GetList(GetCustomersJson);
+        }
+
+        public string GetCustomersJson()
+        {
+            clearHeaders();
             string resource = api_root + "/admin/Customer";
             var method = Method.GET;
             AddHeader("x-es-details", "extended");
             return invokeCommand(method, resource, null, null, null);
         }
 
-        public string GetAccount(string id)
+        public string GetAccountJson(string id)
         {
-            string resource = api_root + "/admin/Account";
+            clearHeaders();
+            string resource = api_root + "/admin/Account/" + id;
             var method = Method.GET;
             AddHeader("x-es-details", "basic");
-            return invokeCommand(method, resource, "accountId=" + id, null, null);
+            return invokeCommand(method, resource, null, null, null);
         }
 
+        public string GetCloudsJson()
+        {
+            clearHeaders();
+            string resource = api_root + "/geography/Cloud";
+            AddHeader("x-es-details", "basic");
+            return invokeCommand(Method.GET, resource, null, null, null);
+        }
+
+        public CloudList GetCloudList()
+        {
+            return new JsonToList<CloudList>().GetList(GetCloudsJson);
+        }
+
+
+        public Account GetAccount(string id)
+        {
+            string json = GetAccountJson(id);
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(AccountList));
+            using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+            {
+                Account account = ((ser.ReadObject(stream) as AccountList).accounts[0]);
+                return account;
+            }
+        }
 
 
 
@@ -68,7 +111,7 @@ namespace Dell.CTO.Enstratius
                               string billingCode,
                               string groupId)
         {
-            string xml = AddUserXmlTemplate.getXml();
+            string xml = XmlTemplates.ResourceManager.GetString("add_user");
             user u = new user();
             u.accountId = accountId;
             u.givenName = givenName;
@@ -92,10 +135,9 @@ namespace Dell.CTO.Enstratius
         }
 
 
-        public string CreatehDeployment(Deployment deployment)
+        public string CreateDeployment(DeploymentLaunch deployment)
         {
-            string template = Properties.Settings.Default["deployment_xml"].ToString();
-            
+            string template = XmlTemplates.ResourceManager.GetString("create_deployment");
             string xml = SmartFormat.Smart.Format(template, deployment);
             clearHeaders();
             AddHeader("x-es-details", "basic");
@@ -106,7 +148,7 @@ namespace Dell.CTO.Enstratius
 
         public string LaunchDeployment(string id)
         {
-            string template = Properties.Settings.Default["launch_deployment_xml"].ToString();
+            string template = XmlTemplates.ResourceManager.GetString("launch_deployment");
             clearHeaders();
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/automation/Deployment/" + id;
@@ -115,7 +157,7 @@ namespace Dell.CTO.Enstratius
 
 
 
-        public string LauchServer(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
+        public string LaunchServer(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
         {
             clearHeaders();
             AddHeader("x-es-details", "basic");
@@ -146,6 +188,63 @@ namespace Dell.CTO.Enstratius
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/infrastructure/Server/" + serverId;
             return invokeCommand(Method.DELETE, resource, "reason=" + reason, null, null);
+        }
+
+
+        public string GetAccountsJson()
+        {
+            clearHeaders();
+            AddHeader("x-es-details", "basic");
+            AddHeader("Accept", "application/json"); // for JSON use application/json
+            return invokeCommand(RestSharp.Method.GET, api_root + "/admin/Account", null, null, null);
+        }
+
+        public AccountList GetAccountList()
+        {
+            return new JsonToList<AccountList>().GetList(GetAccountsJson);
+        }
+
+        public string GetDeploymentsJson()
+        {
+            clearHeaders();
+            AddHeader("x-es-details", "basic");
+            AddHeader("Accept", "application/json"); // for JSON use application/json
+            return invokeCommand(Method.GET, api_root + "/automation/Deployment", null, null, null);
+        }
+
+        public DeploymentList GetDeploymentList()
+        {
+            return new JsonToList<DeploymentList>().GetList(GetDeploymentsJson);
+        }
+
+
+        public string GetServersJson()
+        {
+            clearHeaders();
+            AddHeader("x-es-details", "basic");
+            string resource = api_root + "/infrastructure/Server";
+            return invokeCommand(Method.GET, resource, null, null, null);
+        }
+
+        public ServerList GetServerList()
+        {
+            return new JsonToList<ServerList>().GetList(GetServersJson);
+        }
+
+
+        public delegate string GetStringDelegate();
+
+        public class JsonToList<T>
+        {
+            public T GetList(GetStringDelegate d)
+            {
+                string json = d();
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+                using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+                {
+                    return (T)ser.ReadObject(stream);
+                }
+            }
         }
 
         public string invokeCommand(RestSharp.Method method, string resource, string parameters, object obj, RestSharp.Serializers.ISerializer serializer)
@@ -204,17 +303,18 @@ namespace Dell.CTO.Enstratius
         }
 
 
-        private void init()
+        private void init(string hostBase, string apiAccessId, string apiSecretKey, string userAgent, string apiRoot)
         {
-            host_base = Properties.Settings.Default["host_name"].ToString();
-            api_access_id = Properties.Settings.Default["api_access_id"].ToString();
-            secret_key = Environment.GetEnvironmentVariable("ES_SECRET_KEY");
+            this.host_base = hostBase;
+            this.api_access_id = apiAccessId;
+            this.secret_key = apiSecretKey; 
             if (secret_key == null)
-                throw new Exception("Environment variable ES_SECRET_KEY must contain the secret key");
-            //secret_key = Properties.Settings.Default["secret_key"].ToString();
+                secret_key = Environment.GetEnvironmentVariable("ES_SECRET_KEY");
+            if (secret_key == null)
+                throw new Exception("API secret key must be provided either in the constructor or the environment variable ES_SECRET_KEY must contain the secret key");
             client = new RestClient(host_base);
-            client.UserAgent = Properties.Settings.Default["user_agent"].ToString();
-            api_root = Properties.Settings.Default["api_root"].ToString();
+            client.UserAgent = userAgent;
+            api_root = apiRoot;
         }
 
 

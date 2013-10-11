@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Dell.CTO.Enstratius
@@ -17,7 +16,7 @@ namespace Dell.CTO.Enstratius
         public launch(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
         {
             servers = new Servers();
-            servers.server = new Server();
+            servers.server = new ServerToLaunch();
             servers.server.budget = budget;
             servers.server.name = name;
             servers.server.description = description;
@@ -33,10 +32,10 @@ namespace Dell.CTO.Enstratius
 
     public class Servers
     {
-        public Server server { get; set; }
+        public ServerToLaunch server { get; set; }
     }
 
-    public class Server
+    public class ServerToLaunch
     {
         [XmlAttribute]
         public string budget { get; set; }
@@ -46,7 +45,7 @@ namespace Dell.CTO.Enstratius
         public string product { get; set; }
         public DataCenter dataCenter { get; set; }
 
-        public Server()
+        public ServerToLaunch()
         {
             machineImage = new MachineImage();
             dataCenter = new DataCenter();
