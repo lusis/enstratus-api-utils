@@ -14,6 +14,9 @@ using System.Runtime.Serialization.Json;
 
 namespace Dell.CTO.Enstratius
 {
+
+    public enum DetailsEnum { none, basic, extended };
+
     public class Client
     {
         private string host_base;
@@ -31,9 +34,21 @@ namespace Dell.CTO.Enstratius
         /// <param name="apiSecretKey">The secret key corresponding to the API ID. It must be obtained from the DMCM web console</param>
         /// <param name="userAgent">Any string value that you wish to convey as the user-agent to the DMCM system</param>
         /// <param name="apiRoot">The portion of the URI after the host name. DMCM supports multiple versions of its API. For example: /api/enstratus/2013-03-13</param>
+
+        public DetailsEnum Details { get; set; } 
+        
         public Client(string hostBase, string apiAccessId, string apiSecretKey, string userAgent, string apiRoot)
         {
             init(hostBase, apiAccessId, apiSecretKey, userAgent, apiRoot);
+            Details = DetailsEnum.basic; // the default. can be overridden by accessing the Deails public property
+        }
+
+        private string verbosity
+        {
+            get
+            {
+                return Details.ToString();
+            }
         }
 
         public void AddHeader(string name, string value)
@@ -68,7 +83,7 @@ namespace Dell.CTO.Enstratius
             clearHeaders();
             string resource = api_root + "/admin/Account/" + id;
             var method = Method.GET;
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             return invokeCommand(method, resource, null, null, null);
         }
 
@@ -76,7 +91,7 @@ namespace Dell.CTO.Enstratius
         {
             clearHeaders();
             string resource = api_root + "/geography/Cloud";
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             return invokeCommand(Method.GET, resource, null, null, null);
         }
 
@@ -128,7 +143,7 @@ namespace Dell.CTO.Enstratius
 
 
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/admin/User";
             return invokeStringPost(resource, addUserXmlString);
@@ -140,7 +155,7 @@ namespace Dell.CTO.Enstratius
             string template = XmlTemplates.ResourceManager.GetString("create_deployment");
             string xml = SmartFormat.Smart.Format(template, deployment);
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/automation/Deployment";
             return invokeStringPost(resource, xml);
@@ -160,7 +175,7 @@ namespace Dell.CTO.Enstratius
         public string LaunchServer(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
         {
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/infrastructure/Server";
             launch l = new launch(budget, name, description, machineImageId, product, dataCenterId);
@@ -171,7 +186,7 @@ namespace Dell.CTO.Enstratius
         public string StopServer(string serverId)
         {
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/infrastructure/Server/" + serverId;
             stop s = new stop();
@@ -184,7 +199,7 @@ namespace Dell.CTO.Enstratius
         public string TerminateServer(string serverId, string reason)
         {
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/xml"); // for JSON use application/json
             string resource = api_root + "/infrastructure/Server/" + serverId;
             return invokeCommand(Method.DELETE, resource, "reason=" + reason, null, null);
@@ -194,7 +209,7 @@ namespace Dell.CTO.Enstratius
         public string GetAccountsJson()
         {
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/json"); // for JSON use application/json
             return invokeCommand(RestSharp.Method.GET, api_root + "/admin/Account", null, null, null);
         }
@@ -207,7 +222,7 @@ namespace Dell.CTO.Enstratius
         public string GetDeploymentsJson()
         {
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             AddHeader("Accept", "application/json"); // for JSON use application/json
             return invokeCommand(Method.GET, api_root + "/automation/Deployment", null, null, null);
         }
@@ -221,7 +236,7 @@ namespace Dell.CTO.Enstratius
         public string GetServersJson()
         {
             clearHeaders();
-            AddHeader("x-es-details", "basic");
+            AddHeader("x-es-details", verbosity);
             string resource = api_root + "/infrastructure/Server";
             return invokeCommand(Method.GET, resource, null, null, null);
         }
