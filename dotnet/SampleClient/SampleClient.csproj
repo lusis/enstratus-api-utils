@@ -57,6 +57,7 @@
     <Compile Include="Cloud.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="DataCenter.cs" />
     <Compile Include="Deployment.cs" />
     <Compile Include="DeploymentLaunch.cs" />
     <Compile Include="EnstratiusSerializer.cs" />
@@ -67,6 +68,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Region.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="XmlTemplates.Designer.cs">
       <AutoGen>True</AutoGen>

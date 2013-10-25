@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright (c) 2013 Dell. All rights reserved. Written by Doron Grinstein doron.grinstein@software.dell.com
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,6 +18,13 @@ namespace Dell.CTO.Enstratius
 
     public class Region
     {
+        public string status { get; set; }
+        public string description { get; set; }
+        public string name { get; set; }
+        public Cloud cloud { get; set; }
+        public string providerId { get; set; }
+        public string jurisdiction { get; set; }
+        public Customer customer { get; set; }
         public int regionId { get; set; }
     }
 

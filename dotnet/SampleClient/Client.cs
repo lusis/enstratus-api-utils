@@ -64,54 +64,41 @@ namespace Dell.CTO.Enstratius
         }
 
 
-        public CustomerList GetCustomerList()
+        public CustomerList GetCustomerList(string id = "") // tested
         {
-            return new JsonToList<CustomerList>().GetList(GetCustomersJson);
+            return new JsonToList<CustomerList>().GetList(GetCustomersJson, id);
         }
 
-        public string GetCustomersJson()
+
+        public string GetCustomersJson(string id = "") // tested
         {
             clearHeaders();
             string resource = api_root + "/admin/Customer";
+            if (id != "")
+                resource += "/" + id;
             var method = Method.GET;
             AddHeader("x-es-details", "extended");
             return invokeCommand(method, resource, null, null, null);
         }
 
-        public string GetAccountJson(string id)
-        {
-            clearHeaders();
-            string resource = api_root + "/admin/Account/" + id;
-            var method = Method.GET;
-            AddHeader("x-es-details", verbosity);
-            return invokeCommand(method, resource, null, null, null);
-        }
 
-        public string GetCloudsJson()
+        public string GetCloudsJson(string id = "") //tested
         {
             clearHeaders();
             string resource = api_root + "/geography/Cloud";
+            if (id != "")
+                resource += "/" + id;
             AddHeader("x-es-details", verbosity);
             return invokeCommand(Method.GET, resource, null, null, null);
         }
 
-        public CloudList GetCloudList()
+        public CloudList GetCloudList(string id = "") //tested
         {
-            return new JsonToList<CloudList>().GetList(GetCloudsJson);
+            return new JsonToList<CloudList>().GetList(GetCloudsJson, id);
         }
 
 
-        public Account GetAccount(string id)
-        {
-            string json = GetAccountJson(id);
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(AccountList));
-            using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(json)))
-            {
-                Account account = ((ser.ReadObject(stream) as AccountList).accounts[0]);
-                return account;
-            }
-        }
-
+        
 
 
         public string CreateUser(string accountId,
@@ -150,6 +137,16 @@ namespace Dell.CTO.Enstratius
         }
 
 
+        public string GetJobsJson(string id = "")
+        {
+            clearHeaders();
+            string resource = api_root + "/admin/Job";
+            if (id != "")
+                resource += "/" + id;
+            AddHeader("x-es-details", verbosity);
+            return invokeCommand(Method.GET, resource, null, null, null);
+        }
+
         public string CreateDeployment(DeploymentLaunch deployment)
         {
             string template = XmlTemplates.ResourceManager.GetString("create_deployment");
@@ -161,7 +158,9 @@ namespace Dell.CTO.Enstratius
             return invokeStringPost(resource, xml);
         }
 
-        public string LaunchDeployment(string id)
+
+
+        public string LaunchDeployment(string id) //tested
         {
             string template = XmlTemplates.ResourceManager.GetString("launch_deployment");
             clearHeaders();
@@ -170,9 +169,18 @@ namespace Dell.CTO.Enstratius
             return invokeStringPost(resource, template, true); // 3rd parameter true=PUT (not POST)
         }
 
+        public string StopDeployment(string id) //tested
+        {
+            string template = XmlTemplates.ResourceManager.GetString("stop_deployment");
+            clearHeaders();
+            AddHeader("Accept", "application/xml"); 
+            string resource = api_root + "/automation/Deployment/" + id;
+            return invokeStringPost(resource, template, true); // 3rd parameter true=PUT (not POST)
+        }
 
 
-        public string LaunchServer(string budget, string name, string description, string machineImageId, string product, string dataCenterId)
+
+        public string LaunchServer(string budget, string name, string description, string machineImageId, string product, string dataCenterId) //tested
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
@@ -180,74 +188,119 @@ namespace Dell.CTO.Enstratius
             string resource = api_root + "/infrastructure/Server";
             launch l = new launch(budget, name, description, machineImageId, product, dataCenterId);
             var serializer = new EnstratiusSerializer<launch>();
-            return invokeCommand(Method.POST, resource, null, l, serializer);
+            //return invokeCommand(Method.POST, resource, null, l, serializer);
+            string xml = serializer.Serialize(l);
+            string result =  invokeStringPost(resource, xml);
+            return result;
         }
 
-        public string StopServer(string serverId)
+        public string StopServer(string serverId) //tested
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/xml"); // for JSON use application/json
+            AddHeader("Accept", "application/xml"); 
             string resource = api_root + "/infrastructure/Server/" + serverId;
             stop s = new stop();
             s.force = true;
             s.server = "";
             var serializer = new EnstratiusSerializer<stop>();
-            return invokeCommand(Method.PUT, resource, null, s, serializer);
+            string xml = serializer.Serialize(s);
+            return invokeStringPost(resource, xml, true);
         }
 
-        public string TerminateServer(string serverId, string reason)
+        public string TerminateServer(string serverId, string reason) //tested
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/xml"); // for JSON use application/json
+            AddHeader("Accept", "application/xml"); 
             string resource = api_root + "/infrastructure/Server/" + serverId;
             return invokeCommand(Method.DELETE, resource, "reason=" + reason, null, null);
         }
 
 
-        public string GetAccountsJson()
+        public string GetDataCentersJson(string regionId) //tested
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/json"); // for JSON use application/json
-            return invokeCommand(RestSharp.Method.GET, api_root + "/admin/Account", null, null, null);
+            AddHeader("Accept", "application/json"); 
+            return invokeCommand(RestSharp.Method.GET, api_root + "/geography/DataCenter", "activeOnly=true&regionId=" + regionId,  null, null);
         }
 
-        public AccountList GetAccountList()
+        public DataCenterList GetDataCenterList(string regionId) //tested
         {
-            return new JsonToList<AccountList>().GetList(GetAccountsJson);
+            return new JsonToList<DataCenterList>().GetList(GetDataCentersJson, regionId);
         }
 
-        public string GetDeploymentsJson()
+        public string GetRegionsJson(string regionId = "") //tested
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/json"); // for JSON use application/json
-            return invokeCommand(Method.GET, api_root + "/automation/Deployment", null, null, null);
+            AddHeader("Accept", "application/json"); 
+            if (regionId != "")
+                regionId = "/" + regionId;
+            return invokeCommand(RestSharp.Method.GET, api_root + "/geography/Region" + regionId, null, null, null);
+
         }
 
-        public DeploymentList GetDeploymentList()
+        public RegionList GetRegionList(string regionId = "") //tested
         {
-            return new JsonToList<DeploymentList>().GetList(GetDeploymentsJson);
+            return new JsonToList<RegionList>().GetList(GetRegionsJson, regionId);
         }
 
 
-        public string GetServersJson()
+        public string GetAccountsJson(string id = "") //tested
+        {
+            clearHeaders();
+            string resource = api_root + "/admin/Account";
+            if (id != "")
+                resource += "/" + id;
+            var method = Method.GET;
+            AddHeader("x-es-details", verbosity);
+            return invokeCommand(method, resource, null, null, null);
+        }
+
+
+        public AccountList GetAccountList(string id = "") //tested
+        {
+            return new JsonToList<AccountList>().GetList(GetAccountsJson, id);
+        }
+
+
+
+        public string GetDeploymentsJson(string id = "") //tested
+        {
+            clearHeaders();
+            string resource = api_root + "/automation/Deployment";
+            if (id != "")
+                resource += "/" + id;
+            AddHeader("x-es-details", verbosity);
+            AddHeader("Accept", "application/json"); // for JSON use application/json
+            return invokeCommand(Method.GET, resource, null, null, null);
+        }
+
+        public DeploymentList GetDeploymentList(string id = "") //tested
+        {
+            return new JsonToList<DeploymentList>().GetList(GetDeploymentsJson, id);
+        }
+
+
+        public string GetServersJson() //tested
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
             string resource = api_root + "/infrastructure/Server";
+            AddHeader("Accept", "application/json"); // for JSON use application/json
             return invokeCommand(Method.GET, resource, null, null, null);
         }
 
-        public ServerList GetServerList()
+        public ServerList GetServerList() //tested
         {
             return new JsonToList<ServerList>().GetList(GetServersJson);
         }
 
 
         public delegate string GetStringDelegate();
+        public delegate string GetStringDelegateWithOneParam(string param);
 
         public class JsonToList<T>
         {
@@ -260,10 +313,21 @@ namespace Dell.CTO.Enstratius
                     return (T)ser.ReadObject(stream);
                 }
             }
+
+            public T GetList(GetStringDelegateWithOneParam d, string param)
+            {
+                string json = d(param);
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+                using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+                {
+                    return (T)ser.ReadObject(stream);
+                }
+            }
         }
 
         public string invokeCommand(RestSharp.Method method, string resource, string parameters, object obj, RestSharp.Serializers.ISerializer serializer)
         {
+            
             string full_resource = resource;
             if (parameters != null)
                 full_resource += "?" + parameters;
@@ -274,6 +338,8 @@ namespace Dell.CTO.Enstratius
                 request.XmlSerializer = serializer;
             if ((method == Method.POST) || (method == Method.PUT))
                 request.AddBody(obj);
+
+            
 
             long unixTimeStamp = GetCurrentUnixTimestampMillis();
             string toSign = api_access_id + ":" + method.ToString() + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;

@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add_user" xml:space="preserve">
     <value>&lt;addUser&gt;&lt;users&gt;&lt;user&gt;&lt;account accountId="{accountId}" /&gt;&lt;givenName&gt;{givenName}&lt;/givenName&gt;&lt;familyName&gt;{familyName}&lt;/familyName&gt;&lt;email&gt;{email}&lt;/email&gt;&lt;notificationsTargets&gt;&lt;emailTarget&gt;{emailTarget}&lt;/emailTarget&gt;&lt;/notificationsTargets&gt;&lt;notificationsSettings&gt;&lt;notificationsSetting&gt;&lt;notifyViaEmail&gt;{notifyViaEmail}&lt;/notifyViaEmail&gt;&lt;notifyViaScreen&gt;{notifyViaScreen}&lt;/notifyViaScreen&gt;&lt;eventType&gt;{eventType}&lt;/eventType&gt;&lt;severity&gt;{severity}&lt;/severity&gt;&lt;/notificationsSetting&gt;&lt;/notificationsSettings&gt;&lt;billingCodes&gt;&lt;billingCode billingCodeId="{billingCode}" /&gt;&lt;/billingCodes&gt;&lt;groups&gt;&lt;group groupId="{groupId}" /&gt;&lt;/groups&gt;&lt;/user&gt;&lt;/users&gt;&lt;/addUser&gt;</value>
@@ -141,5 +141,10 @@
     <value>&lt;deploy&gt;
   &lt;deployment  /&gt;
 &lt;/deploy&gt;</value>
+  </data>
+  <data name="stop_deployment" xml:space="preserve">
+    <value>&lt;stop&gt;
+  &lt;deployment  /&gt;
+&lt;/stop&gt;</value>
   </data>
 </root>

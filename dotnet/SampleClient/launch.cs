@@ -23,7 +23,7 @@ namespace Dell.CTO.Enstratius
             servers.server.machineImage.machineImageId = machineImageId;
             string _product = product;
             servers.server.product = _product;
-            servers.server.dataCenter.dataCenterId = dataCenterId;
+            servers.server.dataCenter.dataCenterId = int.Parse(dataCenterId);
         }
 
         public Servers servers { get; set; }
@@ -58,10 +58,5 @@ namespace Dell.CTO.Enstratius
         public string machineImageId { get; set; }
     }
 
-    public class DataCenter
-    {
-        [XmlAttribute]
-        public string dataCenterId { get; set; }
-    }
 
 }
