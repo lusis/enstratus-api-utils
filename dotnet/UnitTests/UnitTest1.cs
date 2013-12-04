@@ -13,10 +13,10 @@ namespace UnitTests
         readonly string KNOWN_ACCOUNT = "200";
         readonly string KNOWN_REGION = "200";
         readonly string KNOWN_CLOUD = "1";
-        readonly string KNOWN_DEPLOYMENT = "202";
-        readonly string KNOWN_BUDGET = "300";
-        readonly string KNOWN_DATA_CENTER = "1";
+        readonly string KNOWN_DEPLOYMENT = "403";
+        readonly string KNOWN_BUDGET = "700"; // same as BillingCode. These terms are used interchangeably by Enstratius
         readonly string KNOWN_MACHINE_IMAGE = "300";
+        readonly string KNOWN_DATA_CENTER = "1";
 
         static Client c;
         static string secretKey = Environment.GetEnvironmentVariable("ES_SECRET_KEY");
@@ -28,13 +28,7 @@ namespace UnitTests
                 c = new Client("http://demo.enstratius.com:15000", "HUFVVXTGJWVZYFWRMAHU", secretKey, "test", "/api/enstratus/2013-03-13");
         }
 
-        [TestMethod]
-        public void TestGetCustomersJson()
-        {
-            string validPreamble = "{\"customers\":[{";
-            string customers = c.GetCustomersJson();
-            Assert.IsTrue(customers.StartsWith(validPreamble));
-        }
+  
 
         [TestMethod]
         public void TestGetCustomerList()
@@ -47,16 +41,6 @@ namespace UnitTests
             Assert.IsTrue(list.customers.Count == 1);
         }
 
-        [TestMethod]
-        public void TestGetAccountsJson()
-        {
-            string validPreamble = "{\"accounts\":[{";
-            string json = c.GetAccountsJson();
-            Assert.IsTrue(json.StartsWith(validPreamble));
-
-            json = c.GetAccountsJson(KNOWN_ACCOUNT);
-            Assert.IsTrue(json.StartsWith(validPreamble));
-        }
 
         [TestMethod]
         public void TestGetAccountList()
@@ -68,13 +52,7 @@ namespace UnitTests
             Assert.IsTrue(list.accounts.Count == 1);
         }
 
-        [TestMethod]
-        public void TestGetDataCentersJson()
-        {
-            string validPreamble = "{\"dataCenters\":[{";
-            string json = c.GetDataCentersJson(KNOWN_REGION);
-            Assert.IsTrue(json.StartsWith(validPreamble));
-        }
+
 
         [TestMethod]
         public void TestGetDataCenterList()
@@ -83,13 +61,7 @@ namespace UnitTests
             Assert.IsTrue(list.dataCenters.Count > 0);
         }
 
-        [TestMethod]
-        public void TestGetRegionsJson()
-        {
-            string validPreamble = "{\"regions\":[{";
-            string json = c.GetRegionsJson();
-            Assert.IsTrue(json.StartsWith(validPreamble));
-        }
+
 
         [TestMethod]
         public void TestGetRegionList()
@@ -100,13 +72,7 @@ namespace UnitTests
             Assert.IsTrue(list.regions.Count == 1);
         }
 
-        [TestMethod]
-        public void TestGetCloudsJson()
-        {
-            string validPreamble = "{\"clouds\":[{";
-            string json = c.GetCloudsJson();
-            Assert.IsTrue(json.StartsWith(validPreamble));
-        }
+
 
         [TestMethod]
         public void TestGetCloudList()
@@ -117,48 +83,42 @@ namespace UnitTests
             Assert.IsTrue(list.clouds.Count == 1);
         }
 
-        [TestMethod]
-        public void TestLaunchDeployment()
-        {
-            string result = c.LaunchDeployment(KNOWN_DEPLOYMENT);
-            Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("LAUNCHING"));
-        }
+        //[TestMethod]
+        //public void TestLaunchDeployment()
+        //{
+        //    string result = c.LaunchDeployment(KNOWN_DEPLOYMENT);
+        //    Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("LAUNCHING"));
+        //}
 
-        [TestMethod]
-        public void TestStopDeployment()
-        {
-            string result = c.StopDeployment(KNOWN_DEPLOYMENT);
-            Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("RUNNING"));
-        }
+        //[TestMethod]
+        //public void TestStopDeployment()
+        //{
+        //    string result = c.StopDeployment(KNOWN_DEPLOYMENT);
+        //    Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("RUNNING"));
+        //}
 
-        [TestMethod]
-        public void TestLaunchServer()
-        {
-            string result = c.LaunchServer(KNOWN_BUDGET, "doron-500", "started from unit test", KNOWN_MACHINE_IMAGE, "1:512", KNOWN_DATA_CENTER);
-            Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("LAUNCHING"));
-        }
+        //[TestMethod]
+        //public void TestLaunchServer()
+        //{
+        //    string result = c.LaunchServer(KNOWN_BUDGET, "doron-500", "started from unit test", KNOWN_MACHINE_IMAGE, "1:512", KNOWN_DATA_CENTER);
+        //    Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("LAUNCHING"));
+        //}
 
         [TestMethod]
         public void TestStopServer()
         {
-            string result = c.StopServer("1753");
+            string result = c.StopServer("2150");
             Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("STOPPING"));
         }
 
         [TestMethod]
         public void TestTerminateServer()
         {
-            string result = c.TerminateServer("1768", "it is no longer needed called from unit test");
+            string result = c.TerminateServer("2150", "it is no longer needed called from unit test");
             Assert.IsTrue(result.Contains("<job jobId=") || result.Contains("TERMINATING"));
         }
 
-        [TestMethod]
-        public void TestGetDeploymentsJson()
-        {
-            string validPreamble = "{\"deployments\":[{";
-            string json = c.GetDeploymentsJson();
-            Assert.IsTrue(json.StartsWith(validPreamble));
-        }
+
 
         [TestMethod]
         public void TestGetDeploymentsList()
@@ -170,19 +130,26 @@ namespace UnitTests
             Assert.IsTrue(list.deployments.Count == 1);
         }
 
-        [TestMethod]
-        public void TestGetServersJson()
-        {
-            string validPreamble = "{\"servers\":[{";
-            string json = c.GetServersJson();
-            Assert.IsTrue(json.StartsWith(validPreamble));
-        }
+
 
         [TestMethod]
         public void TestGetServerList()
         {
             ServerList list = c.GetServerList();
             Assert.IsTrue(list.servers.Count > 0);
+        }
+
+
+
+        [TestMethod]
+        public void TestGetBillingCodeList()
+        {
+            BillingCodeList list = c.GetBillingCodeList();
+            Assert.IsTrue(list.billingCodes.Count > 0);
+
+            list = c.GetBillingCodeList(KNOWN_BUDGET);
+            Assert.IsTrue(list.billingCodes.Count == 1);
+
         }
 
     }

@@ -1,104 +1,67 @@
 ﻿// Copyright (c) 2013 Dell. All rights reserved. Written by Doron Grinstein doron.grinstein@software.dell.com
-using System;
-using System.Collections.Generic;
 using RestSharp;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml.Serialization;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-
-
-
+using System.Collections.Generic;
 
 namespace Dell.CTO.Enstratius
 {
-
-    public enum DetailsEnum { none, basic, extended };
-
-    public class Client
+    public partial class Client
     {
-        private string host_base;
-        private string api_access_id;
-        private string secret_key;
-        private RestClient client;
-        private string api_root;
-        private Dictionary<string, string> additionalHeaders = null;
-
-        /// <summary>
-        /// The constructor for the DMCM Client initializes an object that can communicate with a DMCM server and submit REST API calls.
-        /// </summary>
-        /// <param name="hostBase">The URI endpoint for the DMCM API. For example: http://demo.enstratius.com:15000</param>
-        /// <param name="apiAccessId">An API access ID that must be obtained from the DMCM web console. for example HUFVVXTGJWVZYFWRMAHU</param>
-        /// <param name="apiSecretKey">The secret key corresponding to the API ID. It must be obtained from the DMCM web console</param>
-        /// <param name="userAgent">Any string value that you wish to convey as the user-agent to the DMCM system</param>
-        /// <param name="apiRoot">The portion of the URI after the host name. DMCM supports multiple versions of its API. For example: /api/enstratus/2013-03-13</param>
-
-        public DetailsEnum Details { get; set; } 
-        
-        public Client(string hostBase, string apiAccessId, string apiSecretKey, string userAgent, string apiRoot)
-        {
-            init(hostBase, apiAccessId, apiSecretKey, userAgent, apiRoot);
-            Details = DetailsEnum.basic; // the default. can be overridden by accessing the Deails public property
-        }
-
-        private string verbosity
-        {
-            get
-            {
-                return Details.ToString();
-            }
-        }
-
-        public void AddHeader(string name, string value)
-        {
-            if (additionalHeaders == null)
-                additionalHeaders = new Dictionary<string, string>();
-            additionalHeaders.Add(name, value);
-        }
-
-        public void clearHeaders()
-        {
-            additionalHeaders = null;
-        }
-
-
         public CustomerList GetCustomerList(string id = "") // tested
         {
-            return new JsonToList<CustomerList>().GetList(GetCustomersJson, id);
+            CustomerList list = new CustomerList();
+            DetailsEnum det = Details;
+            Details = DetailsEnum.extended;
+            IEnumerable<string> json = GetJson("/admin/Customer", 500, id);
+            Details = det;
+            foreach (string s in json)
+            {
+                var l = new JsonToList<CustomerList>().GetList(s);
+                if (list.customers != null)
+                    list.customers.AddRange(l.customers);
+                else
+                    list.customers = l.customers;
+            }
+            return list;
         }
 
 
-        public string GetCustomersJson(string id = "") // tested
+        public BillingCodeList GetBillingCodeList(string id = "") //tested
         {
-            clearHeaders();
-            string resource = api_root + "/admin/Customer";
-            if (id != "")
-                resource += "/" + id;
-            var method = Method.GET;
-            AddHeader("x-es-details", "extended");
-            return invokeCommand(method, resource, null, null, null);
+            BillingCodeList list = new BillingCodeList();
+            DetailsEnum det = Details;
+            Details = DetailsEnum.extended;
+            IEnumerable<string> json = GetJson("/admin/BillingCode", 500, id);
+            Details = det;
+            foreach (string s in json)
+            {
+                var l = new JsonToList<BillingCodeList>().GetList(s);
+                if (list.billingCodes != null)
+                    list.billingCodes.AddRange(l.billingCodes);
+                else
+                    list.billingCodes = l.billingCodes;
+            }
+            return list;
         }
 
 
-        public string GetCloudsJson(string id = "") //tested
-        {
-            clearHeaders();
-            string resource = api_root + "/geography/Cloud";
-            if (id != "")
-                resource += "/" + id;
-            AddHeader("x-es-details", verbosity);
-            return invokeCommand(Method.GET, resource, null, null, null);
-        }
 
         public CloudList GetCloudList(string id = "") //tested
         {
-            return new JsonToList<CloudList>().GetList(GetCloudsJson, id);
+
+            CloudList list = new CloudList();
+            IEnumerable<string> json = GetJson("/geography/Cloud", 500, id);
+
+            foreach (string s in json)
+            {
+                var l = new JsonToList<CloudList>().GetList(s);
+                if (list.clouds != null)
+                    list.clouds.AddRange(l.clouds);
+                else
+                    list.clouds = l.clouds;
+            }
+            return list;
         }
 
-
-        
 
 
         public string CreateUser(string accountId,
@@ -140,11 +103,12 @@ namespace Dell.CTO.Enstratius
         public string GetJobsJson(string id = "")
         {
             clearHeaders();
+            IList<Parameter> headers;
             string resource = api_root + "/admin/Job";
             if (id != "")
                 resource += "/" + id;
             AddHeader("x-es-details", verbosity);
-            return invokeCommand(Method.GET, resource, null, null, null);
+            return invokeCommand(Method.GET, resource, null, null, null, out headers);
         }
 
         public string CreateDeployment(DeploymentLaunch deployment)
@@ -173,7 +137,7 @@ namespace Dell.CTO.Enstratius
         {
             string template = XmlTemplates.ResourceManager.GetString("stop_deployment");
             clearHeaders();
-            AddHeader("Accept", "application/xml"); 
+            AddHeader("Accept", "application/xml");
             string resource = api_root + "/automation/Deployment/" + id;
             return invokeStringPost(resource, template, true); // 3rd parameter true=PUT (not POST)
         }
@@ -190,7 +154,7 @@ namespace Dell.CTO.Enstratius
             var serializer = new EnstratiusSerializer<launch>();
             //return invokeCommand(Method.POST, resource, null, l, serializer);
             string xml = serializer.Serialize(l);
-            string result =  invokeStringPost(resource, xml);
+            string result = invokeStringPost(resource, xml);
             return result;
         }
 
@@ -198,7 +162,7 @@ namespace Dell.CTO.Enstratius
         {
             clearHeaders();
             AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/xml"); 
+            AddHeader("Accept", "application/xml");
             string resource = api_root + "/infrastructure/Server/" + serverId;
             stop s = new stop();
             s.force = true;
@@ -211,214 +175,98 @@ namespace Dell.CTO.Enstratius
         public string TerminateServer(string serverId, string reason) //tested
         {
             clearHeaders();
+            IList<Parameter> headers;
             AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/xml"); 
+            AddHeader("Accept", "application/xml");
             string resource = api_root + "/infrastructure/Server/" + serverId;
-            return invokeCommand(Method.DELETE, resource, "reason=" + reason, null, null);
+            return invokeCommand(Method.DELETE, resource, "reason=" + reason, null, null, out headers);
         }
 
 
-        public string GetDataCentersJson(string regionId) //tested
-        {
-            clearHeaders();
-            AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/json"); 
-            return invokeCommand(RestSharp.Method.GET, api_root + "/geography/DataCenter", "activeOnly=true&regionId=" + regionId,  null, null);
-        }
-
+ 
         public DataCenterList GetDataCenterList(string regionId) //tested
         {
-            return new JsonToList<DataCenterList>().GetList(GetDataCentersJson, regionId);
-        }
+            DataCenterList list = new DataCenterList();
+            IEnumerable<string> json = GetJson("/geography/DataCenter", 500, "", "regionId=" + regionId + "&activeOnly=true");
+            foreach (string s in json)
+            {
+                var l = new JsonToList<DataCenterList>().GetList(s);
+                if (list.dataCenters != null)
+                    list.dataCenters.AddRange(l.dataCenters);
+                else
+                    list.dataCenters = l.dataCenters;
+            }
+            return list;
 
-        public string GetRegionsJson(string regionId = "") //tested
-        {
-            clearHeaders();
-            AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/json"); 
-            if (regionId != "")
-                regionId = "/" + regionId;
-            return invokeCommand(RestSharp.Method.GET, api_root + "/geography/Region" + regionId, null, null, null);
-
         }
+            
 
         public RegionList GetRegionList(string regionId = "") //tested
         {
-            return new JsonToList<RegionList>().GetList(GetRegionsJson, regionId);
-        }
-
-
-        public string GetAccountsJson(string id = "") //tested
-        {
-            clearHeaders();
-            string resource = api_root + "/admin/Account";
-            if (id != "")
-                resource += "/" + id;
-            var method = Method.GET;
-            AddHeader("x-es-details", verbosity);
-            return invokeCommand(method, resource, null, null, null);
+            RegionList list = new RegionList();
+            string resource = "/geography/Region";
+            if (regionId != "")
+                regionId = "/" + regionId;
+            resource += regionId;
+            IEnumerable<string> json = GetJson(resource, 500, "", "");
+            foreach (string s in json)
+            {
+                var l = new JsonToList<RegionList>().GetList(s);
+                if (list.regions != null)
+                    list.regions.AddRange(l.regions);
+                else
+                    list.regions = l.regions;
+            }
+            return list;
         }
 
 
         public AccountList GetAccountList(string id = "") //tested
         {
-            return new JsonToList<AccountList>().GetList(GetAccountsJson, id);
+            AccountList list = new AccountList();
+            IEnumerable<string> json = GetJson("/admin/Account", 500, id);
+            foreach (string s in json)
+            {
+                var l = new JsonToList<AccountList>().GetList(s);
+                if (list.accounts != null)
+                    list.accounts.AddRange(l.accounts);
+                else
+                    list.accounts = l.accounts;
+            }
+            return list;            
         }
 
 
-
-        public string GetDeploymentsJson(string id = "") //tested
-        {
-            clearHeaders();
-            string resource = api_root + "/automation/Deployment";
-            if (id != "")
-                resource += "/" + id;
-            AddHeader("x-es-details", verbosity);
-            AddHeader("Accept", "application/json"); // for JSON use application/json
-            return invokeCommand(Method.GET, resource, null, null, null);
-        }
 
         public DeploymentList GetDeploymentList(string id = "") //tested
         {
-            return new JsonToList<DeploymentList>().GetList(GetDeploymentsJson, id);
+            DeploymentList list = new DeploymentList();
+            IEnumerable<string> json = GetJson("/automation/Deployment", 500, id);
+            foreach (string s in json)
+            {
+                var l = new JsonToList<DeploymentList>().GetList(s);
+                if (list.deployments != null)
+                    list.deployments.AddRange(l.deployments);
+                else
+                    list.deployments = l.deployments;
+            }
+            return list;
         }
 
-
-        public string GetServersJson() //tested
-        {
-            clearHeaders();
-            AddHeader("x-es-details", verbosity);
-            string resource = api_root + "/infrastructure/Server";
-            AddHeader("Accept", "application/json"); // for JSON use application/json
-            return invokeCommand(Method.GET, resource, null, null, null);
-        }
 
         public ServerList GetServerList() //tested
         {
-            return new JsonToList<ServerList>().GetList(GetServersJson);
-        }
-
-
-        public delegate string GetStringDelegate();
-        public delegate string GetStringDelegateWithOneParam(string param);
-
-        public class JsonToList<T>
-        {
-            public T GetList(GetStringDelegate d)
+            ServerList list = new ServerList();
+            IEnumerable<string> serversJson = GetJson("/infrastructure/Server");
+            foreach (string s in serversJson)
             {
-                string json = d();
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
-                using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(json)))
-                {
-                    return (T)ser.ReadObject(stream);
-                }
+                var l = new JsonToList<ServerList>().GetList(s);
+                if (list.servers != null)
+                    list.servers.AddRange(l.servers);
+                else
+                    list.servers = l.servers;
             }
-
-            public T GetList(GetStringDelegateWithOneParam d, string param)
-            {
-                string json = d(param);
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
-                using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(json)))
-                {
-                    return (T)ser.ReadObject(stream);
-                }
-            }
-        }
-
-        public string invokeCommand(RestSharp.Method method, string resource, string parameters, object obj, RestSharp.Serializers.ISerializer serializer)
-        {
-            
-            string full_resource = resource;
-            if (parameters != null)
-                full_resource += "?" + parameters;
-
-            RestRequest request = new RestRequest(full_resource, method);
-            request.RequestFormat = DataFormat.Xml;
-            if (serializer != null)
-                request.XmlSerializer = serializer;
-            if ((method == Method.POST) || (method == Method.PUT))
-                request.AddBody(obj);
-
-            
-
-            long unixTimeStamp = GetCurrentUnixTimestampMillis();
-            string toSign = api_access_id + ":" + method.ToString() + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;
-            var signature = sign(secret_key, toSign);
-
-            request.AddHeader("x-esauth-access", api_access_id);
-            request.AddHeader("x-esauth-signature", signature);
-            request.AddHeader("x-esauth-timestamp", unixTimeStamp.ToString());
-            if (additionalHeaders != null)
-                foreach (var di in additionalHeaders)
-                    request.AddHeader(di.Key, di.Value);
-
-            //request.AddHeader("x-es-with-perms", "false");
-
-            var response = client.Execute(request);
-            return response.Content;
-        }
-
-        public string invokeStringPost(string resource, string xml, Boolean put=false)
-        {
-            Method method = Method.POST;
-            string methodString = "POST";
-            if (put)
-            {
-                method = Method.PUT;
-                methodString = "PUT";
-            }
-
-            RestRequest request = new RestRequest(resource, method);
-            request.AddHeader("Accept", "application/xml");
-            request.RequestFormat = DataFormat.Xml;
-            request.AddParameter("text/xml", xml, ParameterType.RequestBody);
-            long unixTimeStamp = GetCurrentUnixTimestampMillis();
-            string toSign = api_access_id + ":" + methodString + ":" + resource + ":" + unixTimeStamp.ToString() + ":" + client.UserAgent;
-            var signature = sign(secret_key, toSign);
-
-            request.AddHeader("x-esauth-access", api_access_id);
-            request.AddHeader("x-esauth-signature", signature);
-            request.AddHeader("x-esauth-timestamp", unixTimeStamp.ToString());
-            var response = client.Execute(request);
-            return response.Content;
-        }
-
-
-        private void init(string hostBase, string apiAccessId, string apiSecretKey, string userAgent, string apiRoot)
-        {
-            this.host_base = hostBase;
-            this.api_access_id = apiAccessId;
-            this.secret_key = apiSecretKey; 
-            if (secret_key == null)
-                secret_key = Environment.GetEnvironmentVariable("ES_SECRET_KEY");
-            if (secret_key == null)
-                throw new Exception("API secret key must be provided either in the constructor or the environment variable ES_SECRET_KEY must contain the secret key");
-            client = new RestClient(host_base);
-            client.UserAgent = userAgent;
-            api_root = apiRoot;
-        }
-
-
-        private static string sign(String key, String stringToSign)
-        {
-            System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
-            byte[] keyByte = encoding.GetBytes(key);
-            HMACSHA256 hmacsha256 = new HMACSHA256(keyByte);
-            return Convert.ToBase64String(hmacsha256.ComputeHash(encoding.GetBytes(stringToSign)));
-        }
-
-
-
-        private static readonly DateTime UnixEpoch =
-            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        public static long GetCurrentUnixTimestampMillis()
-        {
-            DateTime tempTime = DateTime.UtcNow; //.Add(new TimeSpan(1, 0, 0));
-
-            return (long)(tempTime - UnixEpoch).TotalMilliseconds;
+            return list;
         }
     }
-
-
 }
